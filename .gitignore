@@ -1,0 +1,7 @@
+!.gitignore
+DesignPatterns/obj
+DesignPatterns/bin
+HelloWorld/obj
+HelloWorld/bin
+Multithreading/obj
+Multithreading/bin
