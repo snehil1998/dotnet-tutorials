@@ -19,14 +19,13 @@ public static class PulseAndWait {
 
     private static void Write()
     {
-        Monitor.Enter(_lock); 
+        Monitor.Enter(_lock); // current thread implements the lock
         for(int i=0; i<5; i++)
         {
-            Monitor.Pulse(_lock); // notifies thread 2 to start implementing its method
             Console.WriteLine("Write thread working... " + i);
-
+            Monitor.Pulse(_lock); // notifies the other thread in waiting queue that it is done and you can get ready to tart your job by moving to ready queue
             Console.WriteLine("Write thread completed... " + i);
-            Monitor.Wait(_lock); // waits for the notification from thread 2
+            Monitor.Wait(_lock); // thread will release lock and move to the wait queue. wait there until the other thread which has locked notifies that it's complete
         }
     }
 

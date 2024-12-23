@@ -9,11 +9,11 @@ public static class Lock {
 
         Stopwatch watch = Stopwatch.StartNew();
 
+        // without locking it will lead to inconsistent sum everytime we run this coz all three threads try to access method and update sum simultaneously
         Thread t1 = new Thread(Addition);
         Thread t2 = new Thread(Addition);
         Thread t3 = new Thread(Addition);
 
-        // without locking it will lead to inconsistent sum everytime we run this coz all three threads try to access method and update sum simultaneously
         t1.Start();
         t2.Start();
         t3.Start();
@@ -26,6 +26,28 @@ public static class Lock {
 
         watch.Stop();
         Console.WriteLine("Total tick time is: " + watch.ElapsedTicks);
+
+        Console.WriteLine("Main method execution has completed");
+        Console.ReadLine();
+    }
+
+    public static void ImplementTryEnter() {
+        Console.WriteLine("Main method execution started");
+
+        // example for try enter function, where a thread should not acquire lock coz it times out (exceeds 1sec)
+        Thread t1 = new Thread(TryEnterMethod) {
+            Name = "Thread1"
+        };
+        Thread t2 = new Thread(TryEnterMethod) {
+            Name = "Thread2"
+        };
+        Thread t3 = new Thread(TryEnterMethod) {
+            Name = "Thread3"
+        };
+
+        t1.Start();
+        t2.Start();
+        t3.Start();
 
         Console.WriteLine("Main method execution has completed");
         Console.ReadLine();
@@ -57,6 +79,35 @@ public static class Lock {
                 if(lockTaken) {
                     Monitor.Exit(_lock);
                 }
+            }
+        }
+    }
+
+    private static void TryEnterMethod() {
+        bool lockTaken = false;
+        TimeSpan milliseconds = TimeSpan.FromMilliseconds(1000); // 1 sec
+        try
+        {
+            Monitor.TryEnter(_lock, milliseconds, ref lockTaken);
+            if(lockTaken)
+            {
+                Console.WriteLine($"{Thread.CurrentThread.Name} acquired lock");
+                for(int i=0; i<5; i++) 
+                {
+                    Thread.Sleep(100);
+                }
+                Console.WriteLine($"{Thread.CurrentThread.Name} executed locked code");
+            }
+            else
+            {
+                Console.WriteLine($"{Thread.CurrentThread.Name} failed to acquire lock within the timeout");
+            }
+        }
+        finally
+        {
+            if(lockTaken) {
+                Monitor.Exit(_lock);
+                Console.WriteLine($"{Thread.CurrentThread.Name} exited from the lock");
             }
         }
     }

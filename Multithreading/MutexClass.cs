@@ -18,11 +18,17 @@ public class MutexClass {
     }
     private static void Write()
     {
-        Console.WriteLine("Write thread waiting... ");
-        _event.WaitOne();
-        Console.WriteLine("Write thread working... ");
-        Thread.Sleep(5000);
-        Console.WriteLine("Write thread completed... ");
-        _event.ReleaseMutex();
+        Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} Write thread waiting... ");
+        if(_event.WaitOne())
+        {
+            Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} Write thread working... ");
+            Thread.Sleep(5000);
+            Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} Write thread completed... ");
+            _event.ReleaseMutex();
+        }
+        else
+        {
+            Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} Could not execute lock... ");
+        }
     }
 }
